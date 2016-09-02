@@ -44,7 +44,7 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Surname"
+                android:hint="Full Name"
                 android:id="@+id/surnameFirstname"
                 android:enabled="false"
                 android:textColor="#111111"
@@ -78,9 +78,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:text="+234XXXXXXXXXX"
+            android:hint="XXXXXXXXXXX"
             android:layout_marginLeft="10dp"
             android:id="@+id/mobileNumber"
+            android:enabled="false"
+            android:textColor="#343434"
+            android:textSize="14sp"/>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:hint="XXXXXXXXXXX"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/mobileNumber2"
             android:enabled="false"
             android:textColor="#343434"
             android:textSize="14sp"/>

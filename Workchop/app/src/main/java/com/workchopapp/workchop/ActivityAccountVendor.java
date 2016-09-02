@@ -79,7 +79,7 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
     ActionBar appBar;
     Button editAccount;
     ImageView accountImage;
-    EditText surnameFirstname, email, mobileNumber;
+    EditText surnameFirstname, email, mobileNumber, mobileNumber2;
     Spinner vendorType;
     int editMode;
     int SELECT_PHOTO = 1;
@@ -129,6 +129,7 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
         locationLabel = (TextView)findViewById(R.id.locationLabel);
         vendorLocation = (EditText)findViewById(R.id.userLocation);
         mobileNumber = (EditText)findViewById(R.id.mobileNumber);
+        mobileNumber2 = (EditText)findViewById(R.id.mobileNumber2);
         editAccount.setEnabled(true);
 
         new getVendorDetails(ActivityAccountVendor.this).execute(vendorId);
@@ -146,12 +147,20 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
                     surnameFirstname.setEnabled(false);
                     vendorType.setEnabled(false);
                     mobileNumber.setEnabled(false);
+                    mobileNumber2.setEnabled(false);
                     email.setEnabled(false);
                     vendorType.setEnabled(false);
                     vendorLocation.setEnabled(false);
                     editAccount.setText("Edit");
+                    String number = "";
+                    if(mobileNumber2.getText().toString().length() < 10){
+                        number = mobileNumber.getText().toString();
+                    }
+                    else{
+                        number = mobileNumber.getText().toString() + "&&" + mobileNumber2.getText().toString();
+                    }
                     new updateVendorDetails(ActivityAccountVendor.this).execute(vendorId,surnameFirstname.getText().toString(),
-                           String.valueOf(vendorType.getSelectedItemPosition()), mobileNumber.getText().toString(), email.getText().toString(),
+                           String.valueOf(vendorType.getSelectedItemPosition()), number, email.getText().toString(),
                             String.valueOf(workchopUserLocationIndex));
                 }
                 else{
@@ -198,6 +207,7 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
 
         surnameFirstname.setTypeface(type);
         mobileNumber.setTypeface(type);
+        mobileNumber2.setTypeface(type);
         email.setTypeface(type);
         mobileNumberLabel = (TextView)findViewById(R.id.mobileNumberLabel);
         emailLabel = (TextView)findViewById(R.id.emailLabel);
@@ -366,7 +376,32 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
 
     @Override
     public void done2() {
-        vendorLocation.setText("Location "+workchopUserLocationIndex);
+        String locationString="";
+        switch (workchopUserLocationIndex)
+        {
+            case 1:
+                locationString = "<Surulere--Badagry>";
+                break;
+            case 2:
+                locationString = "<Ikeja--Berger>";
+                break;
+            case 3:
+                locationString = "<Shomolu--Ilupeju>";
+                break;
+            case 4:
+                locationString = "<Yaba--Obalende>";
+                break;
+            case 5:
+                locationString = "<Ojota--Ikorodu>";
+                break;
+            case 6:
+                locationString = "<V.I--Epe>";
+                break;
+            case 7:
+                locationString = "<Oshodi--Egbeda>";
+                break;
+        }
+        vendorLocation.setText(locationString);
     }
 
     @Override
@@ -426,8 +461,14 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
                             else{
                                 surnameFirstname.setText(values[0]);
                                 vendorType.setSelection(Integer.parseInt(values[4]));
-                                mobileNumber.setText(values[1]);
-                                email.setText(values[2]);
+                                if(values[1].contains("&&")) {
+                                    mobileNumber.setText(values[1].split("&&")[0]);
+                                    mobileNumber2.setText(values[1].split("&&")[1]);
+                                }
+                                else{
+                                    mobileNumber.setText(values[1]);
+                                }
+                                    email.setText(values[2]);
                                 String locationString="";
                                 switch (Integer.parseInt(values[3]))
                                 {
@@ -453,7 +494,7 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
                                         locationString = "<Oshodi--Egbeda>";
                                         break;
                                 }
-                                vendorLocation.setText("Location " + values[3]+": "+locationString);
+                                vendorLocation.setText(locationString);
                                 workchopUserLocationIndex = Integer.parseInt(values[3]);
                             }
                         }
@@ -516,6 +557,7 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
                             surnameFirstname.setEnabled(true);
                             vendorType.setEnabled(true);
                             mobileNumber.setEnabled(true);
+                            mobileNumber2.setEnabled(true);
                             email.setEnabled(true);
                             vendorLocation.setEnabled(true);
                             editAccount.setText("Done");
@@ -580,7 +622,11 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
                 if(sb.toString().equals("done")){
                     h.post(new Runnable() {
                         public void run() {
-                            new getVendorDetails(context).execute(vendorId);
+                            //new getVendorDetails(context).execute(vendorId);
+                            Intent intent = getIntent();
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            finish();
+                            startActivity(intent);
                             Toast.makeText(context,"Account Details Updated", Toast.LENGTH_SHORT).show();
                         }
                     });

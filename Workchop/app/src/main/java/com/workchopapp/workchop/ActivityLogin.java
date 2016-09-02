@@ -507,7 +507,8 @@ public class ActivityLogin extends AppCompatActivity {
                         } else {
                             //Toast.makeText(ActivityLogin.this, "Check Filled Data", Toast.LENGTH_SHORT).show();
                         }
-                    } else if (normalTabIndex == 2) {
+                    }
+                    else if (normalTabIndex == 2) {
                         if (userReadyToSignUp == 0 || surname.getText().toString().length() < 3 || firstname.getText().toString().length() < 3
                                 || enterPasword.getText().toString().length() < 3 || phoneNo.getText().toString().length() < 3
                                 || selectedVendorType == 0) {

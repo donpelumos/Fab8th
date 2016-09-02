@@ -1057,11 +1057,11 @@ DialogVendorProfile.Close{
                         if(sb.toString().split("--")[0].equals("done")) {
                             Toast.makeText(context,"Vendor Added As Contact", Toast.LENGTH_SHORT).show();
                             addingVendor.dismiss();
-                            //Intent intent = getIntent();
-                            //intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            //finish();
-                            //startActivity(intent);
-                            //onAdd();
+
+                            Intent intent = getIntent();
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            finish();
+                            startActivity(intent);
                         }
                     }
                 });

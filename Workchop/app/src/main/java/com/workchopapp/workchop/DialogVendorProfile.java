@@ -1062,6 +1062,9 @@ DialogChat.ReturnListener{
         nameText.setTypeface(type, Typeface.BOLD);
         nameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         nameText.setTextColor(Color.parseColor("#000000"));
+        StringBuilder textBuilder = new StringBuilder(name.split(" ")[1]);
+        textBuilder.replace(0,1,name.split(" ")[1].substring(0,1).toUpperCase());
+        name = name.split(" ")[0] + " " + textBuilder.toString();
         nameText.setText(name.split(" ")[1]+" . "+name.split(" ")[0].substring(0,1).toUpperCase()+" - ");
 
         ImageView pointsImage = new ImageView(context);

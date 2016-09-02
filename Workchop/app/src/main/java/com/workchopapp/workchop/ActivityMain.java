@@ -99,7 +99,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     int index;
     Map<String, String> sortedContacts;
     ArrayList<String> contactsName, contactsNumber, contactsDetails, newContactsName, newContactsNumber, foundVendors,
-            finalContactsList;
+            finalContactsList, foundVendors2, finalContactsList2;
     ArrayList<Integer> contactsIndex, newContactsIndex;
     LinearLayout contactList;
     TabHost tabHost;
@@ -109,7 +109,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     TextView messageRoundTabFrame, exitRoundTabFrame;
     TextView messageRoundTab, exitRoundTab;
     ImageView messageRoundImage, exitRoundImage;
-    ProgressDialog progress;
+    ProgressDialog progress, backupProgress;
     TextView selectVendorType;
     ImageView selectVendorTypeIcon;
     LinearLayout selectVendorTypeList;
@@ -729,6 +729,10 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         },5000);
 
         new phoneNoToFile2(ActivityMain.this).execute(userId);
+        backupProgress = new ProgressDialog(ActivityMain.this);
+        backupProgress.setTitle("Backing up contact and vendor information");
+        backupProgress.setMessage("This may take a few(3-4) minutes");
+        getContactsCount();
     }
 
     public void  phoneNoToFile(){
@@ -1961,6 +1965,382 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
 
     }
 
+    public void getContactsCount() {
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        contactsDetails = new ArrayList<String>();
+        foundVendors = new ArrayList<String>();
+        if (cur.getCount() > 0 ) {
+            //Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).replace("-","")
+                        .replace("(","")
+                        .replace(")", "");
+                String phone = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        .replaceAll("\\s+", "")
+                        .replace("-","")
+                        .replace("(","")
+                        .replace(")","");
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER))) > 0) {
+                    //Log.v("Contact " + index, "Name : " + name + " -- Phone : " + phone + " -- ID : " + id);
+                    String joined = name +" "+ phone;
+                    contactsDetails.add(joined);
+                    contactsName.add(name);
+                    contactsNumber.add(phone);
+                    contactsIndex.add(index);
+                }
+                index++;
+            }
+            sortedContacts = new HashMap<>();
+            for(int i=0; i<contactsDetails.size(); i++){
+                sortedContacts.put(contactsDetails.get(i),"");
+            }
+            Collections.sort(contactsDetails);
+            Log.v("=============","=================");
+            for(int i=0; i<contactsDetails.size(); i++){
+                //Log.v("TESTING",contactsDetails.get(i));
+            }
+
+            int inn = 1;
+            Map<String, String> treeMap = new TreeMap<>(sortedContacts);
+            for(Map.Entry<String, String> val : treeMap.entrySet()){
+                //Log.v("SORTED NO REPETITION "+inn,val.getValue() + "---" + val.getKey());
+                inn++;
+            }
+
+            //Toast.makeText(ActivityMain.this,"User Contacts Size - "+treeMap.size(),Toast.LENGTH_SHORT).show();
+            new checkContactsEqual(ActivityMain.this).execute(userId,String.valueOf(treeMap.size()));
+            /*Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+                    Toast.LENGTH_SHORT).show();*/
+            //Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+            //Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private class checkContactsEqual extends AsyncTask<String,Void,String> {
+        Context context;
+
+        public checkContactsEqual(Context c){
+            context = c;
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            String dataUrl = "http://workchopapp.com/mobile_app/get_user_contacts_count.php";
+            String dataUrlParameters = null;
+            try {
+                dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
+            }
+            catch (UnsupportedEncodingException e) {
+                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+            }
+
+            URL url = null;
+            HttpURLConnection connection = null;
+            try{
+
+                url = new URL(dataUrl+"?"+dataUrlParameters);
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(new URI(dataUrl+"?"+dataUrlParameters));
+                HttpResponse response = client.execute(request);
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                final StringBuffer sb = new StringBuffer("");
+                String line="";
+                while ((line = in.readLine()) != null) {
+                    sb.append(line);
+                    break;
+                }
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context,"Existing contacts-"+params[1]+" and database contacts-"+sb.toString(),
+                                //Toast.LENGTH_SHORT).show();
+                        if(Integer.parseInt(params[1]) < Integer.parseInt(sb.toString())){
+                            //Toast.makeText(context,"NO NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
+                        }
+                        else if((Integer.parseInt(params[1])-Integer.parseInt(sb.toString())) > 25){
+                            //Toast.makeText(context,"NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
+                            backupProgress.show();
+                            readContacts2();
+                        }
+                    }
+                });
+                in.close();
+            }
+
+            catch(Exception e){
+                Log.v("ERROR",e.getMessage());
+            }
+            return null;
+        }
+    }
+
+    public void readContacts2() {
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        contactsDetails = new ArrayList<String>();
+        foundVendors2 = new ArrayList<String>();
+        finalContactsList2 = new ArrayList<String>();
+        if (cur.getCount() > 0 ) {
+            //Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).replace("-","")
+                        .replace("(","")
+                        .replace(")", "");
+                String phone = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        .replaceAll("\\s+", "")
+                        .replace("-","")
+                        .replace("(","")
+                        .replace(")","");
+                if (Integer.parseInt(cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER))) > 0) {
+                    //Log.v("Contact " + index, "Name : " + name + " -- Phone : " + phone + " -- ID : " + id);
+                    String joined = name +" "+ phone.replace("+234","0");
+                    contactsDetails.add(joined);
+                    contactsName.add(name);
+                    contactsNumber.add(phone);
+                    contactsIndex.add(index);
+                }
+                index++;
+            }
+            sortedContacts = new HashMap<>();
+            for(int i=0; i<contactsDetails.size(); i++){
+                sortedContacts.put(contactsDetails.get(i),"");
+            }
+            Collections.sort(contactsDetails);
+            Log.v("=============","=================");
+            for(int i=0; i<contactsDetails.size(); i++){
+                //Log.v("TESTING",contactsDetails.get(i));
+            }
+
+            int inn = 1;
+            Map<String, String> treeMap = new TreeMap<>(sortedContacts);
+            for(Map.Entry<String, String> val : treeMap.entrySet()){
+                //Log.v("SORTED NO REPETITION "+inn,val.getValue() + "---" + val.getKey());
+                inn++;
+            }
+            ArrayList<Integer> found = findVendors2(treeMap);
+
+            Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
+        }
+        uploadUserCotacts2();
+
+    }
+
+    public void uploadUserCotacts2 (){
+        uploadUserVendors2();
+        for(int i=0; i < finalContactsList2.size(); i++){
+            String [] value = finalContactsList2.get(i).split(" ");
+            //Log.v("CONTACT ID "+i, finalContactsList.get(i));
+            String contactName = "";
+            String contactNumber = "";
+            for(int j=0; j< value.length; j++){
+                if(j == (value.length-1)){
+                    contactNumber = value[j];
+                }
+                else{
+                    contactName = contactName + " " + value[j];
+                }
+            }
+            new contactsUploader2(ActivityMain.this).execute(userId,contactName,contactNumber,
+                    String.valueOf(finalContactsList2.size() - i));
+        }
+
+        Toast.makeText(ActivityMain.this,"USER CONTACTS FULLY UPLOADED", Toast.LENGTH_LONG).show();
+    }
+
+    public void uploadUserVendors2(){
+        for(int i=0; i < foundVendors2.size(); i++){
+            String [] value = foundVendors2.get(i).split(" ");
+            Log.v("INSIDE SORTING VENDORS "+i, foundVendors2.get(i));
+            String contactName = "";
+            int contactType = 0;
+            String contactNumber = "";
+            for(int j=0; j< value.length; j++){
+                if(j == (value.length-1)){
+                    contactNumber = value[j];
+                }
+                else{
+                    contactName = contactName + " " + value[j];
+                }
+            }
+            if(contactName.toLowerCase().contains("gas") || contactName.toLowerCase().contains("gas supplier")){
+                contactType = 1;
+            }
+            else if(contactName.toLowerCase().contains("hair") || contactName.toLowerCase().contains("stylist") ||
+                    contactName.toLowerCase().contains("hair stylist") || contactName.toLowerCase().contains("barber")){
+                contactType = 2;
+            }
+            else if(contactName.toLowerCase().contains("makeup") || contactName.toLowerCase().contains("make up") ){
+                contactType = 3;
+            }
+            else if(contactName.toLowerCase().contains("mech.") || contactName.toLowerCase().contains("mechanic") ||
+                    contactName.toLowerCase().contains("car repair") || contactName.toLowerCase().contains("rewire")){
+                contactType = 4;
+            }
+            else if(contactName.toLowerCase().contains("tailor") || contactName.toLowerCase().contains("fashion")){
+                contactType = 5;
+            }
+            new vendorsUploader2(ActivityMain.this).execute(userId,contactName,contactNumber,String.valueOf(contactType),"0",
+                    String.valueOf(workchopUserLocationIndex));
+        }
+    }
+
+    private class contactsUploader2 extends AsyncTask<String,Void,String> {
+        Context context;
+
+        public contactsUploader2(Context c){
+            context = c;
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            String dataUrl = "http://workchopapp.com/mobile_app/upload_user_contacts.php";
+
+            String dataUrlParameters = null;
+            try {
+                dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8")
+                        +"&contact_name="+URLEncoder.encode(params[1],"UTF-8")
+                        +"&contact_number="+URLEncoder.encode(params[2],"UTF-8");
+            }
+            catch (UnsupportedEncodingException e) {
+                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+            URL url = null;
+            HttpURLConnection connection = null;
+            Log.v("REFRESH CONTACTS UPLOAD",dataUrl+"?"+dataUrlParameters);
+            try{
+
+                url = new URL(dataUrl+"?"+dataUrlParameters);
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(new URI(dataUrl+"?"+dataUrlParameters));
+                HttpResponse response = client.execute(request);
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                final StringBuffer sb = new StringBuffer("");
+                String line="";
+                Log.v("ADDRESS",dataUrl+"?"+dataUrlParameters);
+                while ((line = in.readLine()) != null) {
+                    sb.append(line);
+                    break;
+                }
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        if(sb.toString().split("--")[0].equals("done")) {
+                            //Toast.makeText(context, "TEMPORARY SIGN UP", Toast.LENGTH_LONG).show();
+                        }
+                        if(Integer.parseInt(params[3]) < 2){
+                            backupProgress.dismiss();
+                            Toast.makeText(context, "BACK-UP COMPLETE", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                in.close();
+            }
+            catch(Exception e){
+                Log.v("ERROR",e.getMessage());
+            }
+            return null;
+        }
+    }
+
+    private class vendorsUploader2 extends AsyncTask<String,Void,String> {
+        Context context;
+
+        public vendorsUploader2(Context c){
+            context = c;
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            String dataUrl = "http://workchopapp.com/mobile_app/upload_user_vendors.php";
+            String dataUrl2 = "http://workchopapp.com/mobile_app/update_user_location.php";
+            String dataUrlParameters = null;
+            String dataUrlParameters2 = null;
+            try {
+                dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8")
+                        +"&vendor_name="+URLEncoder.encode(params[1],"UTF-8")
+                        +"&vendor_number="+URLEncoder.encode(params[2],"UTF-8")
+                        +"&vendor_type="+URLEncoder.encode(params[3],"UTF-8")
+                        +"&is_vendor_smart="+URLEncoder.encode(params[4],"UTF-8")
+                        +"&vendor_location_category="+URLEncoder.encode(params[5],"UTF-8");
+                dataUrlParameters2 = "id="+ URLEncoder.encode(params[0],"UTF-8")
+                        +"&location_index="+URLEncoder.encode(params[5],"UTF-8");
+            }
+            catch (UnsupportedEncodingException e) {
+                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+
+            URL url = null;
+            HttpURLConnection connection = null;
+            try{
+
+                url = new URL(dataUrl+"?"+dataUrlParameters);
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(new URI(dataUrl+"?"+dataUrlParameters));
+                HttpResponse response = client.execute(request);
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                final StringBuffer sb = new StringBuffer("");
+                String line="";
+                while ((line = in.readLine()) != null) {
+                    sb.append(line);
+                    break;
+                }
+                String [] values = sb.toString().split("--");
+
+                url = new URL(dataUrl2+"?"+dataUrlParameters2);
+                Log.v("REFRESH VENDORS UPLOAD", dataUrl+"?"+dataUrlParameters);
+                //Log.v("NEW URL =========", dataUrl2+"?"+dataUrlParameters2);
+                HttpClient client2 = new DefaultHttpClient();
+                HttpGet request2 = new HttpGet();
+                request2.setURI(new URI(dataUrl2+"?"+dataUrlParameters2));
+                HttpResponse response2 = client2.execute(request2);
+                BufferedReader in2 = new BufferedReader(new InputStreamReader(response2.getEntity().getContent()));
+
+                final StringBuffer sb2 = new StringBuffer("");
+                String line2="";
+                while ((line2 = in2.readLine()) != null) {
+                    sb2.append(line);
+                    break;
+                }
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //progressdialog.dismiss();
+                        new vendorAsContact(ActivityMain.this).execute(userId,params[1],params[2]);
+
+                        //Toast.makeText(context,"Vendor Successfully Added", Toast.LENGTH_SHORT).show();
+                        //onAdd();
+                    }
+                });
+
+                in.close();
+            }
+
+            catch(Exception e){
+                Log.v("ERROR",e.getMessage());
+            }
+            return null;
+        }
+    }
+
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(ActivityMain.this)
@@ -2002,6 +2382,25 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         value.toLowerCase().equals("hair") || value.toLowerCase().equals("stylist")){
                     vendorIndexList.add(index);
                     foundVendors.add(val.getKey());
+                }
+            }
+            index++;
+        }
+        return vendorIndexList;
+    }
+
+    public ArrayList<Integer> findVendors2(Map<String, String> vendorList){
+        ArrayList<Integer> vendorIndexList = new ArrayList<Integer>();
+        int index=0;
+        for(Map.Entry<String, String> val : vendorList.entrySet()){
+            finalContactsList2.add(val.getKey());
+            String [] valArray = val.getKey().split(" +");
+            for(String value : valArray){
+                if(value.toLowerCase().equals("mechanic") || value.toLowerCase().equals("gas") || value.toLowerCase().equals("makeup") ||
+                        value.toLowerCase().equals("tailor") || value.toLowerCase().equals("fashion designer")|| value.toLowerCase().equals("fashion") ||
+                        value.toLowerCase().equals("hair") || value.toLowerCase().equals("stylist")){
+                    vendorIndexList.add(index);
+                    foundVendors2.add(val.getKey());
                 }
             }
             index++;

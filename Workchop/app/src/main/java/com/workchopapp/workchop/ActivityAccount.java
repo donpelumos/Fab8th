@@ -580,7 +580,11 @@ DialogUserSelectLocation.ColorSelected{
                 if(sb.toString().equals("done")){
                     h.post(new Runnable() {
                         public void run() {
-                            new getUserDetails(context).execute(userId);
+                            //new getUserDetails(context).execute(userId);
+                            Intent intent = getIntent();
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            finish();
+                            startActivity(intent);
                             Toast.makeText(context,"Account Details Updated", Toast.LENGTH_SHORT).show();
                         }
                     });
