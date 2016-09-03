@@ -268,7 +268,7 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                             adp.notifyDataSetChanged();
 
                             for (int i = 0; i < chatNames.size(); i++) {
-                                chats.add(new ListChats(chatNames.get(i), R.drawable.chat, chatTimes.get(i),
+                                chats.add(new ListChats(chatNames.get(i), R.drawable.chat, getDateFormat(chatTimes.get(i)),
                                         Integer.parseInt(chatCount.get(i))));
                             }
                             adp.notifyDataSetChanged();
@@ -492,7 +492,7 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                                 chats = new ArrayList<ListChats>();
 
                                 for (int i = 0; i < chatNames.size(); i++) {
-                                    chats.add(new ListChats(chatNames.get(i), R.drawable.chat, chatTimes.get(i),
+                                    chats.add(new ListChats(chatNames.get(i), R.drawable.chat, getDateFormat(chatTimes.get(i)),
                                             Integer.parseInt(chatCount.get(i))));
                                 }
                                 //messageList.setAdapter(null);
@@ -591,5 +591,28 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
         //return super.onOptionsItemSelected(item);
     }
 
+    public String getDateFormat(String date){
+        String newFormat = "";
+        String datePart = date.split(" ")[0];
+        String timePart = date.split(" ")[1];
+        String year = datePart.split("-")[0];
+        String month = datePart.split("-")[1];
+        String day = datePart.split("-")[2];
+        String dayString = day;
+        String [] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        String monthString = months[Integer.parseInt(month)-1];
+
+        String hour = timePart.split(":")[0];
+        String timeSector = "am";
+        if(Integer.parseInt(hour)>12){
+            hour = String.valueOf(Integer.parseInt(hour)-12);
+            timeSector = "pm";
+        }
+        String minute = timePart.split(":")[1];
+        String second = timePart.split(":")[2];
+
+        newFormat = monthString+"-"+dayString+" | "+hour+":"+minute+" "+timeSector;
+        return newFormat;
+    }
 
 }

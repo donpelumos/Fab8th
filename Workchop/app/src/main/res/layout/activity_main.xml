@@ -312,29 +312,34 @@
                     android:layout_width="match_parent"
                     android:layout_weight="0.5"
                     android:layout_height="50dp"
+                    android:visibility="gone"
                     android:layout_gravity="left">
                     <TextView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:id="@+id/messageRoundTabFrame"
+                        android:id="@+id/exitRoundTabFrame2"
+                        android:visibility="gone"
                         android:layout_gravity="left"
                         android:background="@drawable/background_transparent_circle"/>
                     <TextView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:id="@+id/messageRoundTab"
-                        android:layout_marginTop="3dp"
-                        android:clickable="true"
-                        android:layout_marginLeft="3dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:layout_gravity="left"
+                        android:id="@+id/exitRoundTab2"
+                        android:clickable="true"
+                        android:visibility="gone"
+                        android:layout_marginLeft="6dp"
+                        android:scaleType="centerCrop"
+                        android:layout_marginTop="6dp"
                         android:background="@drawable/background_grey_circle"/>
                     <ImageView
                         android:layout_width="44dp"
                         android:layout_height="44dp"
-                        android:src="@drawable/chat"
+                        android:src="@drawable/exit_new"
                         android:layout_gravity="left"
-                        android:id="@+id/messageRoundImage"
+                        android:id="@+id/exitRoundImage"
                         android:clickable="true"
+                        android:visibility="gone"
                         android:layout_marginLeft="3dp"
                         android:scaleType="centerCrop"
                         android:layout_marginTop="3dp"/>
@@ -347,29 +352,28 @@
                     <TextView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:id="@+id/exitRoundTabFrame2"
+                        android:id="@+id/messageRoundTabFrame"
                         android:layout_gravity="right"
                         android:background="@drawable/background_transparent_circle"/>
                     <TextView
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:layout_gravity="right"
-                        android:id="@+id/exitRoundTab2"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:id="@+id/messageRoundTab"
+                        android:layout_marginTop="3dp"
                         android:clickable="true"
-                        android:layout_marginRight="6dp"
-                        android:scaleType="centerCrop"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_gravity="right"
                         android:background="@drawable/background_grey_circle"/>
                     <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/exit_new"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:src="@drawable/chat"
                         android:layout_gravity="right"
-                        android:id="@+id/exitRoundImage"
+                        android:id="@+id/messageRoundImage"
                         android:clickable="true"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginRight="3dp"
                         android:scaleType="centerCrop"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="3dp"/>
                 </FrameLayout>
             </LinearLayout>
         </RelativeLayout>

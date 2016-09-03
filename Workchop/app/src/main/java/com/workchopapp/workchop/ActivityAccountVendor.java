@@ -29,6 +29,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -231,6 +233,13 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_account, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -244,6 +253,30 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                break;
+
+            case R.id.signOut:
+                new android.support.v7.app.AlertDialog.Builder(ActivityAccountVendor.this)
+                        .setIcon(R.drawable.signout)
+                        .setTitle("Sign Out")
+                        .setMessage("Are you sure you want to sign out?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //finish();
+                                new setLoggedOut(ActivityAccountVendor.this).execute(vendorId);
+                                deleteDatabase("workchop_user_account.db");
+                                ActivityAccountVendor.this.finishAffinity();
+                                //Intent intent = new Intent(ActivityVendorMain.this, ActivityLogin.class);
+                                //startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
                 break;
         }
         return true;
@@ -266,6 +299,52 @@ public class ActivityAccountVendor extends AppCompatActivity implements DialogPi
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setType("image/*");
             startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+        }
+    }
+
+    private class setLoggedOut extends AsyncTask<String,Void,String> {
+        Context context;
+
+        public setLoggedOut(Context c){
+            context = c;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String dataUrl = "http://workchopapp.com/mobile_app/set_logged_out_vendor.php";
+            String dataUrlParameters = null;
+            try {
+                dataUrlParameters = "vendor_id="+ URLEncoder.encode(params[0],"UTF-8");
+            }
+            catch (UnsupportedEncodingException e) {
+                Toast.makeText(ActivityAccountVendor.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+
+            URL url = null;
+            HttpURLConnection connection = null;
+            try{
+
+                url = new URL(dataUrl+"?"+dataUrlParameters);
+                HttpClient client = new DefaultHttpClient();
+                HttpGet request = new HttpGet();
+                request.setURI(new URI(dataUrl+"?"+dataUrlParameters));
+                HttpResponse response = client.execute(request);
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                final StringBuffer sb = new StringBuffer("");
+                String line="";
+                while ((line = in.readLine()) != null) {
+                    sb.append(line);
+                    break;
+                }
+
+                in.close();
+            }
+
+            catch(Exception e){
+                Log.v("ERROR",e.getMessage());
+            }
+            return null;
         }
     }
 

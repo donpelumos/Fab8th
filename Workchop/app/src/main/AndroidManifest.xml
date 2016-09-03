@@ -169,7 +169,7 @@
         </activity>
         <activity
             android:name="com.workchopapp.workchop.ActivityFeedbackVendor"
-            android:label="Change Password"
+            android:label="Feedback"
             android:parentActivityName="com.workchopapp.workchop.ActivityVendorMain"
             android:windowSoftInputMode="stateAlwaysHidden" >
             <meta-data
@@ -178,7 +178,7 @@
         </activity>
         <activity
             android:name="com.workchopapp.workchop.ActivityReportIssueVendor"
-            android:label="Change Password"
+            android:label="Report An Issue"
             android:parentActivityName="com.workchopapp.workchop.ActivityVendorMain"
             android:windowSoftInputMode="stateAlwaysHidden" >
             <meta-data

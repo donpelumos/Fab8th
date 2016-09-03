@@ -16,6 +16,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,6 +45,8 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.FacebookSdk;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -131,6 +134,7 @@ public class ActivityVendorMain extends AppCompatActivity implements DialogUserS
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vendor_main);
         index = 0;
@@ -274,66 +278,57 @@ public class ActivityVendorMain extends AppCompatActivity implements DialogUserS
             }
         });
 
-        vendorProfileRows = new ListUserProfile[]{
+        vendorProfileRows = new ListUserProfile[]{new ListUserProfile("About",R.drawable.aboutvendor),
                 new ListUserProfile("Account",R.drawable.account), new ListUserProfile("Change Password",R.drawable.password ),
                 new ListUserProfile("Feedback",R.drawable.feedback), new ListUserProfile("Rate App",R.drawable.rate),
-                new ListUserProfile("Report An Issue",R.drawable.report ), new ListUserProfile("Sign Out",R.drawable.signout)};
+                new ListUserProfile("Report An Issue",R.drawable.report ), new ListUserProfile("Share",R.drawable.shareicon),
+                new ListUserProfile("Terms and Privacy Notice",R.drawable.privacy)};
 
         final AdapterUserProfile adp = new AdapterUserProfile(view.getContext(),R.layout.row_userprofile, vendorProfileRows );
         vendorProfileList.setAdapter(adp);
         vendorProfileList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0){
+                if(position == 1){
                     Intent intent = new Intent(ActivityVendorMain.this, ActivityAccountVendor.class);
                     intent.putExtra("vendorId",vendorId);
                     startActivity(intent);
                 }
-                else if(position == 1){
+                else if(position == 2){
                     Intent intent = new Intent(ActivityVendorMain.this, ActivityChangePasswordVendor.class);
                     intent.putExtra("vendorId",vendorId);
                     startActivity(intent);
                 }
-                else if(position == 2){
+                else if(position == 3){
                     Intent intent = new Intent(ActivityVendorMain.this, ActivityFeedbackVendor.class);
                     intent.putExtra("vendorId",vendorId);
                     startActivity(intent);
                 }
-                else if(position == 3){
+                else if(position == 4){
                     DialogRateAppVendor rateFragment = new DialogRateAppVendor();
                     Bundle bundle = new Bundle();
                     bundle.putString("vendorId",vendorId);
                     rateFragment.setArguments(bundle);
                     rateFragment.show(getFragmentManager(), "dialog9");
                 }
-                else if(position == 4){
+                else if(position == 5){
                     Intent intent = new Intent(ActivityVendorMain.this, ActivityReportIssueVendor.class);
                     intent.putExtra("vendorId",vendorId);
                     startActivity(intent);
                 }
-                else if(position == 5){
-                    new AlertDialog.Builder(ActivityVendorMain.this)
-                            .setIcon(R.drawable.signout)
-                            .setTitle("Sign Out")
-                            .setMessage("Are you sure you want to sign out?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //finish();
-                                    handler.removeCallbacksAndMessages(null);
-                                    new setLoggedOut(ActivityVendorMain.this).execute(vendorId);
-                                    deleteDatabase("workchop_user_account.db");
-                                    ActivityVendorMain.this.finishAffinity();
-                                    //Intent intent = new Intent(ActivityVendorMain.this, ActivityLogin.class);
-                                    //startActivity(intent);
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .show();
+                else if(position == 6){
+                    DialogShare dialog = new DialogShare();
+                    dialog.show(getFragmentManager(), "dialog33");
+                }
+                else if(position == 7){
+                    String url = "http://www.workchopapp.com/terms.php";
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+                else if(position == 0){
+                    DialogAbout aboutFragment = new DialogAbout();
+                    aboutFragment.show(getFragmentManager(), "dialog29");
                 }
             }
         });
@@ -587,7 +582,7 @@ public class ActivityVendorMain extends AppCompatActivity implements DialogUserS
                             adp.notifyDataSetChanged();
 
                             for (int i = 0; i < chatNames.size(); i++) {
-                                chats.add(new ListChats(chatNames.get(i), R.drawable.chat, chatTimes.get(i),
+                                chats.add(new ListChats(chatNames.get(i), R.drawable.chat, getDateFormat(chatTimes.get(i)),
                                         Integer.parseInt(chatCounts.get(i))));
                             }
                             adp.notifyDataSetChanged();
@@ -772,7 +767,7 @@ public class ActivityVendorMain extends AppCompatActivity implements DialogUserS
                                 chats = new ArrayList<ListChats>();
                                 for (int i = 0; i < chatNames.size(); i++) {
                                     Log.v("COUNT", chatCounts.get(i));
-                                    chats.add(new ListChats(chatNames.get(i), R.drawable.chat, chatTimes.get(i),
+                                    chats.add(new ListChats(chatNames.get(i), R.drawable.chat, getDateFormat(chatTimes.get(i)),
                                             Integer.parseInt(chatCounts.get(i))));
                                 /*
                                 if(checkNotification == 1) {
@@ -1058,6 +1053,30 @@ public class ActivityVendorMain extends AppCompatActivity implements DialogUserS
             }
             return null;
         }
+    }
+
+    public String getDateFormat(String date){
+        String newFormat = "";
+        String datePart = date.split(" ")[0];
+        String timePart = date.split(" ")[1];
+        String year = datePart.split("-")[0];
+        String month = datePart.split("-")[1];
+        String day = datePart.split("-")[2];
+        String dayString = day;
+        String [] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        String monthString = months[Integer.parseInt(month)-1];
+
+        String hour = timePart.split(":")[0];
+        String timeSector = "am";
+        if(Integer.parseInt(hour)>12){
+            hour = String.valueOf(Integer.parseInt(hour)-12);
+            timeSector = "pm";
+        }
+        String minute = timePart.split(":")[1];
+        String second = timePart.split(":")[2];
+
+        newFormat = monthString+"-"+dayString+" | "+hour+":"+minute+""+timeSector;
+        return newFormat;
     }
 
     private class RoundTabHighlighterOnTouchListener implements View.OnTouchListener {

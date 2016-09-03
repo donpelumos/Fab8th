@@ -149,8 +149,17 @@ public class DialogChat extends DialogFragment {
                 DateFormat dateMinute = new SimpleDateFormat("mm");
                 DateFormat dateSecond = new SimpleDateFormat("ss");
                 Date date = new Date();
-                chatContainer.addView(setUserChat(chatTextBar.getText().toString(), dateHour.format(date)+":"+dateMinute.format(date)+
-                        " "+dateDay.format(date)+"-"+dateMonth.format(date)+"-"+dateYear.format(date),
+                String timeSector = "";
+                String hourString=dateHour.format(date);
+                if(Integer.parseInt(dateHour.format(date))>12){
+                    timeSector = "pm";
+                    hourString = String.valueOf(Integer.parseInt(hourString) - 12);
+                }
+                else{
+                    timeSector = "am";
+                }
+
+                chatContainer.addView(setUserChat(chatTextBar.getText().toString(), hourString+":"+dateMinute.format(date)+" "+timeSector,
                         getActivity().getApplicationContext()));
                 new uploadChats(getActivity().getApplicationContext()).execute(userId, vendorId, chatTextBar.getText().toString(),
                         userId);
@@ -332,7 +341,7 @@ public class DialogChat extends DialogFragment {
                                 String date_time = valuesa[1];
                                 String sender = valuesa[2];
                                 new clearChats(context).execute(params[0],params[1]);
-                                chatContainer.addView(setVendorChat(msg, date_time, context));
+                                chatContainer.addView(setVendorChat(msg, getDateFormat(date_time), context));
                                 chatContainerScroller.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -470,9 +479,11 @@ public class DialogChat extends DialogFragment {
                                     for (int i = 0; i < allChats.length; i++) {
                                         String[] chatRows = allChats[i].split("--");
                                         if (chatRows[2].equals(userId)) {
-                                            chatContainer.addView(setUserChat(chatRows[3], chatRows[4], getActivity().getApplicationContext()));
+                                            chatContainer.addView(setUserChat(chatRows[3], getDateFormat(chatRows[4]),
+                                                    getActivity().getApplicationContext()));
                                         } else {
-                                            chatContainer.addView(setVendorChat(chatRows[3], chatRows[4], getActivity().getApplicationContext()));
+                                            chatContainer.addView(setVendorChat(chatRows[3], getDateFormat(chatRows[4]),
+                                                    getActivity().getApplicationContext()));
                                         }
                                         chatContainerScroller.post(new Runnable() {
                                             @Override
@@ -502,6 +513,43 @@ public class DialogChat extends DialogFragment {
             }
             return null;
         }
+    }
+
+    public String getDateFormat(String date){
+        DateFormat dateMonth = new SimpleDateFormat("MM");
+        DateFormat dateDay = new SimpleDateFormat("dd");
+        Date systemDate = new Date();
+        int showMonth = 1;
+
+        String newFormat = "";
+        String datePart = date.split(" ")[0];
+        String timePart = date.split(" ")[1];
+        String year = datePart.split("-")[0];
+        String month = datePart.split("-")[1];
+        String day = datePart.split("-")[2];
+        String dayString = day;
+        String [] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        String monthString = months[Integer.parseInt(month)-1];
+
+        String hour = timePart.split(":")[0];
+        String timeSector = "am";
+        //Log.v("MONTHS",dateMonth.format(systemDate)+"--"+month);
+        if(dateMonth.format(systemDate).equals(month) && dateDay.format(systemDate).equals(day)){
+            showMonth = 0;
+        }
+        if(Integer.parseInt(hour)>12){
+            hour = String.valueOf(Integer.parseInt(hour)-12);
+            timeSector = "pm";
+        }
+        String minute = timePart.split(":")[1];
+        String second = timePart.split(":")[2];
+        if(showMonth == 1) {
+            newFormat = monthString + "-" + dayString + " | " + hour + ":" + minute + "" + timeSector;
+        }
+        else{
+            newFormat = hour + ":" + minute + "" + timeSector;
+        }
+            return newFormat;
     }
 
     public LinearLayout setUserChat(String message, String time, Context context){

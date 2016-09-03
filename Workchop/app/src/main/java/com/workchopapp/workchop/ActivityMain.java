@@ -367,8 +367,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 new ListUserProfile("My Vendors",R.drawable.myvendors), new ListUserProfile("Rate App",R.drawable.rate),
                 new ListUserProfile("Report An Issue",R.drawable.report ), new ListUserProfile("Share",R.drawable.shareicon),
                 new ListUserProfile("Work Points",R.drawable.reward),
-                new ListUserProfile("Terms and Privacy Notice",R.drawable.privacy),
-                new ListUserProfile("Sign Out",R.drawable.signout)};
+                new ListUserProfile("Terms and Privacy Notice",R.drawable.privacy)};
 
         final AdapterUserProfile adp = new AdapterUserProfile(view.getContext(),R.layout.row_userprofile, userProfileRows );
         userProfileList.setAdapter(adp);
@@ -430,7 +429,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                     startActivity(i);
                 }
                 else if(position == 10){
-                    new AlertDialog.Builder(ActivityMain.this)
+                    /*new AlertDialog.Builder(ActivityMain.this)
                             .setIcon(R.drawable.signout)
                             .setTitle("Sign Out")
                             .setMessage("Are you sure you want to sign out?")
@@ -450,7 +449,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             })
-                            .show();
+                            .show();*/
                 }
             }
         });
@@ -465,6 +464,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         exitRoundImage = (ImageView)findViewById(R.id.exitRoundImage);
         messageRoundImage.setOnTouchListener(new ImageHighlighterOnTouchListener(messageRoundImage));
         exitRoundImage.setOnTouchListener(new ImageHighlighterOnTouchListener(exitRoundImage));
+        exitRoundTab.setVisibility(View.GONE);
 
         messageRoundTab.setOnClickListener(new View.OnClickListener() {
             @Override
