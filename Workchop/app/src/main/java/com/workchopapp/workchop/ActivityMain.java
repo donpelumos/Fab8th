@@ -74,7 +74,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;import java.util.ArrayList;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -136,9 +139,9 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     int checkNotification = 1;
     ArrayList<Integer> phoneNotificationIds;
     String loggedPhoneNo = "";
-    Handler handler;
-
-
+    Handler handler, handlerChats;
+    ArrayAdapter adapterRecent;
+    int totalChatCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -219,24 +222,24 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         File database=getApplicationContext().getDatabasePath("rubbish.db");
 
         if (!database.exists() && getIntent().getStringExtra("val7").equals("signupScreen")) {
-            //Toast.makeText(ActivityMain.this, "Sample Database not Found", Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this, "Sample Database not Found", Toast.LENGTH_SHORT).show();
             mydatabase  = openOrCreateDatabase("rubbish.db",MODE_PRIVATE,null);
             dialogUserSelectLocation.show(getFragmentManager(),"dialog14");
             Log.v("I AM INSIDE","1");
         }
         else if (!database.exists() && getIntent().getStringExtra("val7").equals("loginScreen")){
-            //Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
             workchopUserLocationIndex = Integer.parseInt(getIntent().getStringExtra("val5"));
             userId = getIntent().getStringExtra("val6");
             loggedPhoneNo = getIntent().getStringExtra("val3");
-            //Toast.makeText(ActivityMain.this,"USER ID - " +userId,Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,"USER ID - " +userId,Toast.LENGTH_SHORT).show();
             new getVendorTypes2(ActivityMain.this).execute("");
             Log.v("I AM INSIDE","2");
             //phoneNoToFile();
             new getChats(ActivityMain.this).execute(userId);
         }
         else if (database.exists() && getIntent().getStringExtra("val7").equals("signupScreen")){
-            //Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
             mydatabase  = openOrCreateDatabase("rubbish.db",MODE_PRIVATE,null);
             dialogUserSelectLocation.show(getFragmentManager(),"dialog14");
             Log.v("I AM INSIDE","3");
@@ -254,11 +257,11 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             Log.v("I AM INSIDE","4");
         }
         else{
-            //Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this, "Sample Database Found", Toast.LENGTH_SHORT).show();
             workchopUserLocationIndex = Integer.parseInt(getIntent().getStringExtra("val5"));
             userId = getIntent().getStringExtra("val6");
             loggedPhoneNo = getIntent().getStringExtra("val3");
-            //Toast.makeText(ActivityMain.this,"USER ID - " +userId,Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,"USER ID - " +userId,Toast.LENGTH_SHORT).show();
             new getVendorTypes2(ActivityMain.this).execute("");
             Log.v("I AM INSIDE","5");
             //phoneNoToFile();
@@ -724,7 +727,16 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             @Override
             public void run() {
                 pollCaller();
-                handler.postDelayed(this,30000);
+                handler.postDelayed(this,45000);
+            }
+        },5000);
+
+        handlerChats = new Handler();
+        handlerChats.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                pollCaller2();
+                handlerChats.postDelayed(this,8000);
             }
         },5000);
 
@@ -750,7 +762,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             writer.append(loggedPhoneNo);
             writer.flush();
             writer.close();
-            //Toast.makeText(this, "Data has been written to Report File", Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(this, "Data has been written to Report File", Toast.LENGTH_SHORT).show();
         }
         catch(IOException e)
         {
@@ -775,7 +787,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -805,8 +817,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -820,7 +861,143 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         }
         catch(NullPointerException e){
             Log.v("ERROR CAUSE", e.toString());
-            Toast.makeText(ActivityMain.this," ",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ActivityMain.this," ",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void pollCaller2(){
+        try {
+            //Log.v("CHATS SIZE", String.valueOf(chats.size()));
+            new pollingChatCount(ActivityMain.this).execute(userId);
+            Log.v("CALLING CHAT COUNTER", "POLL ");
+        }
+        catch(NullPointerException e){
+            Log.v("ERROR CAUSE", e.toString());
+            //Toast.makeText(ActivityMain.this," ",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class pollingChatCount extends AsyncTask<String, Void, String> {
+        Context context;
+        public pollingChatCount(Context c){
+            context = c;
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            final String dataUrl2 = "http://workchopapp.com/mobile_app/get_user_chat_list2.php";
+            String dataUrlParameters = null;
+            try {
+                dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
+            }
+            catch (UnsupportedEncodingException e) {
+                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+            try {
+                HttpClient client2 = new DefaultHttpClient();
+                HttpGet request2 = new HttpGet();
+                request2.setURI(new URI(dataUrl2+"?"+dataUrlParameters));
+                HttpResponse response2 = client2.execute(request2);
+                BufferedReader in2 = new BufferedReader(new InputStreamReader(response2.getEntity().getContent()));
+
+                final StringBuffer sb2 = new StringBuffer("");
+                String line2="";
+                while ((line2 = in2.readLine()) != null) {
+                    sb2.append(line2);
+                    break;
+                }
+
+                in2.close();
+
+                Handler h = new Handler(Looper.getMainLooper());
+                final String finalDataUrlParameters = dataUrlParameters;
+                h.post(new Runnable() {
+                    public void run() {
+                        //Log.v("full text",sb.toString());
+                        if(sb2.toString().contains("------")) {
+                            String[] allChats = sb2.toString().split("------");
+                            ArrayList<String>newChatCount = new ArrayList<String>();
+                            ArrayList<String> newChatTimes = new ArrayList<String>();
+                            ArrayList<String> newChatNames = new ArrayList<String>();
+                            ArrayList<String> newChatIds = new ArrayList<String>();
+
+                            int tempTotalChatCount = 0;
+                            int beep = 0;
+
+                            for (int i = 0; i < allChats.length; i++) {
+                                String[] chatRows = allChats[i].split("--");
+                                newChatNames.add(chatRows[1]);
+                                newChatTimes.add(chatRows[3]);
+                                newChatIds.add(chatRows[0]);
+                                newChatCount.add(chatRows[4]);
+                                tempTotalChatCount = tempTotalChatCount + Integer.parseInt(chatRows[4]);
+                                //Log.v("URI", dataUrl2 + "?" + finalDataUrlParameters);
+                            }
+
+                            if(totalChatCount > 0 && totalChatCount < tempTotalChatCount ) {
+                                beep = 1;
+                            }
+                            if(tempTotalChatCount == 0){
+                                totalChatCount = tempTotalChatCount;
+                                beep = 0;
+                            }
+                            else if(totalChatCount != tempTotalChatCount){
+                                totalChatCount = tempTotalChatCount;
+                                beep = 1;
+                            }
+                            else{
+                                beep = 0;
+                            }
+
+                            if(beep == 1){
+                                MediaPlayer mp = MediaPlayer.create(context, R.raw.beep1);
+                                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                v.vibrate(400);
+                                if (mp != null) {
+                                    mp.release();
+                                }
+                                mp = MediaPlayer.create(context, R.raw.beep1);
+                                mp.start();
+                                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                    public void onCompletion(MediaPlayer mp) {
+                                        mp.release();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+
+            return null;
         }
     }
 
@@ -841,7 +1018,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&mode="+URLEncoder.encode(params[1],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -889,8 +1066,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -987,7 +1193,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         @Override
         protected String doInBackground(final String... params) {
             String imageUrl = "http://workchopapp.com/mobile_app/vendor_pictures/" + params[0] + ".jpg";
-
+            Log.v("IMAGE URL",imageUrl);
             String dataUrlParameters = null;
 
             URL url = null;
@@ -1010,6 +1216,8 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                             View view = recentList.getChildAt(Integer.parseInt(params[1]));
                             ImageView recentImage = (ImageView)view.findViewById(R.id.chatIcon);
                             recentImage.setImageBitmap(img);
+                            //adapterRecent.notifyDataSetChanged();
+
                         }
                         catch(NullPointerException e){
                             Log.v("NULL IMAGE POINTER","");
@@ -1019,8 +1227,29 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 connection.disconnect();
             }
 
-            catch(Exception e){
-                Log.v("ERROR GETTING IMAGE",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1042,7 +1271,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1114,8 +1343,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1136,7 +1394,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1171,12 +1429,13 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                                 for (int i = 0; i < values.length; i++) {
                                     recentIds.add(values[i].split("--")[1]);
                                     recents.add(new ListChats(values[i].split("--")[2], R.drawable.recent_icon_blue,
-                                            values[i].split("--")[3],0));
+                                            getDateFormat(values[i].split("--")[3]),0));
                                 }
 
-                                ArrayAdapter adp = new AdapterRecent(getApplicationContext(), R.layout.row_chats, recents);
-                                adp.notifyDataSetChanged();
-                                recentList.setAdapter(adp);
+                                adapterRecent = new AdapterRecent(getApplicationContext(), R.layout.row_chats, recents);
+                                adapterRecent.notifyDataSetChanged();
+                                recentList.setAdapter(adapterRecent);
+
                                 for(int i=0; i<recentIds.size(); i++){
                                     new getRecentImage(context).execute(recentIds.get(i),String.valueOf(i));
                                 }
@@ -1187,11 +1446,64 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
+    }
+
+    public String getDateFormat(String date){
+        String newFormat = "";
+        String datePart = date.split(" ")[0];
+        String timePart = date.split(" ")[1];
+        String year = datePart.split("-")[0];
+        String month = datePart.split("-")[1];
+        String day = datePart.split("-")[2];
+        String dayString = day;
+        String [] months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        String monthString = months[Integer.parseInt(month)-1];
+
+        String hour = timePart.split(":")[0];
+        String timeSector = "am";
+        if(Integer.parseInt(hour)>12){
+            hour = String.valueOf(Integer.parseInt(hour)-12);
+            timeSector = "pm";
+        }
+        String minute = timePart.split(":")[1];
+        String second = timePart.split(":")[2];
+
+        newFormat = monthString+"-"+dayString+" | "+hour+":"+minute+" "+timeSector;
+        return newFormat;
     }
 
     public void uploadUserCotacts (){
@@ -1213,7 +1525,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         }
         new getVendorTypes(ActivityMain.this).execute("");
 
-        Toast.makeText(ActivityMain.this,"USER CONTACTS FULLY UPLOADED", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ActivityMain.this,"USER CONTACTS FULLY UPLOADED", Toast.LENGTH_SHORT).show();
     }
 
     public void uploadUserVendors(){
@@ -1261,10 +1573,10 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             @Override
             public void run() {
                 progress.dismiss();
-                //Toast.makeText(ActivityMain.this,"User location - "+workchopUserLocationIndex,Toast.LENGTH_SHORT).show();
+                ////Toast.makeText(ActivityMain.this,"User location - "+workchopUserLocationIndex,Toast.LENGTH_SHORT).show();
             }
         },2000);
-        Toast.makeText(ActivityMain.this,foundVendors.size()+" VENDORS SUCCESSFULLY ADDED TO YOUR VENDORS LIST",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ActivityMain.this,foundVendors.size()+" VENDORS SUCCESSFULLY ADDED TO YOUR VENDORS LIST",Toast.LENGTH_SHORT).show();
     }
 
     public void setVendorTypes(){
@@ -1478,7 +1790,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&contact_number="+URLEncoder.encode(params[2],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
             URL url = null;
             HttpURLConnection connection = null;
@@ -1503,7 +1815,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 h.post(new Runnable() {
                     public void run() {
                         if(sb.toString().split("--")[0].equals("done")) {
-                            //Toast.makeText(context, "TEMPORARY SIGN UP", Toast.LENGTH_SHORT).show();
+                            ////Toast.makeText(context, "TEMPORARY SIGN UP", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -1511,8 +1823,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1555,7 +1896,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        //Toast.makeText(context,"DOWNLOADED VENDOR TYPES = "+workchopVendorList.toString(),Toast.LENGTH_SHORT).show();
+                        ////Toast.makeText(context,"DOWNLOADED VENDOR TYPES = "+workchopVendorList.toString(),Toast.LENGTH_SHORT).show();
                         setVendorTypes();
                     }
                 });
@@ -1563,8 +1904,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1607,7 +1977,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        //Toast.makeText(context,"DOWNLOADED VENDOR TYPES = "+workchopVendorList.toString(),Toast.LENGTH_SHORT).show();
+                        ////Toast.makeText(context,"DOWNLOADED VENDOR TYPES = "+workchopVendorList.toString(),Toast.LENGTH_SHORT).show();
                         setVendorTypes2();
                     }
                 });
@@ -1615,8 +1985,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1665,8 +2064,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1696,7 +2124,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&location_index="+URLEncoder.encode(params[5],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1743,8 +2171,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1768,7 +2225,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&contact_number="+URLEncoder.encode(params[2],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1794,7 +2251,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 h.post(new Runnable() {
                     public void run() {
                         if(sb.toString().split("--")[0].equals("done")) {
-                            //Toast.makeText(context,"Vendor Added As Contact", Toast.LENGTH_SHORT).show();
+                            ////Toast.makeText(context,"Vendor Added As Contact", Toast.LENGTH_SHORT).show();
                             //onAdd();
                         }
                     }
@@ -1803,8 +2260,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1825,7 +2311,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1849,8 +2335,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -1871,7 +2386,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -1909,7 +2424,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         contactsDetails = new ArrayList<String>();
         foundVendors = new ArrayList<String>();
         if (cur.getCount() > 0 ) {
-            //Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
             while (cur.moveToNext()) {
                 String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
                 String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).replace("-","")
@@ -1954,13 +2469,13 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 text.setText("Contact Details -- " + foundVendors.get(i));
                 //contactList.addView(text);
             }
-            /*Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+            /*//Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
                     Toast.LENGTH_SHORT).show();*/
-            //Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+            ////Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
                     //Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -1972,7 +2487,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         contactsDetails = new ArrayList<String>();
         foundVendors = new ArrayList<String>();
         if (cur.getCount() > 0 ) {
-            //Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
             while (cur.moveToNext()) {
                 String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
                 String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).replace("-","")
@@ -2010,15 +2525,15 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 inn++;
             }
 
-            //Toast.makeText(ActivityMain.this,"User Contacts Size - "+treeMap.size(),Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,"User Contacts Size - "+treeMap.size(),Toast.LENGTH_SHORT).show();
             new checkContactsEqual(ActivityMain.this).execute(userId,String.valueOf(treeMap.size()));
-            /*Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+            /*//Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
                     Toast.LENGTH_SHORT).show();*/
-            //Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+            ////Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
             //Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -2038,7 +2553,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 dataUrlParameters = "user_id="+ URLEncoder.encode(params[0],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
 
             URL url = null;
@@ -2061,13 +2576,13 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        //Toast.makeText(context,"Existing contacts-"+params[1]+" and database contacts-"+sb.toString(),
+                        ////Toast.makeText(context,"Existing contacts-"+params[1]+" and database contacts-"+sb.toString(),
                                 //Toast.LENGTH_SHORT).show();
                         if(Integer.parseInt(params[1]) < Integer.parseInt(sb.toString())){
-                            //Toast.makeText(context,"NO NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
+                            ////Toast.makeText(context,"NO NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
                         }
                         else if((Integer.parseInt(params[1])-Integer.parseInt(sb.toString())) > 25){
-                            //Toast.makeText(context,"NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
+                            ////Toast.makeText(context,"NEED FOR REFRESH",Toast.LENGTH_SHORT).show();
                             backupProgress.show();
                             readContacts2();
                         }
@@ -2076,8 +2591,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -2091,7 +2635,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         foundVendors2 = new ArrayList<String>();
         finalContactsList2 = new ArrayList<String>();
         if (cur.getCount() > 0 ) {
-            //Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
+            ////Toast.makeText(ActivityMain.this,String.valueOf(cur.getCount())+" Contacts exist",Toast.LENGTH_SHORT).show();
             while (cur.moveToNext()) {
                 String id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID));
                 String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).replace("-","")
@@ -2130,11 +2674,11 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             }
             ArrayList<Integer> found = findVendors2(treeMap);
 
-            Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
-                    Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ActivityMain.this,String.valueOf(treeMap.size())+" Contacts Exist. Found "+foundVendors.size()+" Vendors",
+                    //Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(ActivityMain.this,"Contacts don't exist on this device",Toast.LENGTH_SHORT).show();
         }
         uploadUserCotacts2();
 
@@ -2159,7 +2703,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                     String.valueOf(finalContactsList2.size() - i));
         }
 
-        Toast.makeText(ActivityMain.this,"USER CONTACTS FULLY UPLOADED", Toast.LENGTH_LONG).show();
+        //Toast.makeText(ActivityMain.this,"USER CONTACTS FULLY UPLOADED", Toast.LENGTH_LONG).show();
     }
 
     public void uploadUserVendors2(){
@@ -2217,7 +2761,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&contact_number="+URLEncoder.encode(params[2],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
             }
             URL url = null;
             HttpURLConnection connection = null;
@@ -2242,18 +2786,47 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 h.post(new Runnable() {
                     public void run() {
                         if(sb.toString().split("--")[0].equals("done")) {
-                            //Toast.makeText(context, "TEMPORARY SIGN UP", Toast.LENGTH_LONG).show();
+                            ////Toast.makeText(context, "TEMPORARY SIGN UP", Toast.LENGTH_LONG).show();
                         }
                         if(Integer.parseInt(params[3]) < 2){
                             backupProgress.dismiss();
-                            Toast.makeText(context, "BACK-UP COMPLETE", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(context, "BACK-UP COMPLETE", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
                 in.close();
             }
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -2283,7 +2856,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&location_index="+URLEncoder.encode(params[5],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
+                //Toast.makeText(ActivityMain.this,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
             }
 
             URL url = null;
@@ -2326,7 +2899,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         //progressdialog.dismiss();
                         new vendorAsContact(ActivityMain.this).execute(userId,params[1],params[2]);
 
-                        //Toast.makeText(context,"Vendor Successfully Added", Toast.LENGTH_SHORT).show();
+                        ////Toast.makeText(context,"Vendor Successfully Added", Toast.LENGTH_SHORT).show();
                         //onAdd();
                     }
                 });
@@ -2334,8 +2907,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+
+                    }
+                });
             }
             return null;
         }
@@ -2353,6 +2955,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         //finish();
                         ActivityMain.this.finishAffinity();
                         handler.removeCallbacksAndMessages(null);
+                        handlerChats.removeCallbacksAndMessages(null);
                         //new setLoggedOut(ActivityMain.this).execute(userId);
                     }
                 })
@@ -2368,6 +2971,17 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
+        handlerChats.removeCallbacksAndMessages(null);
+        /*
+        finishAffinity();
+        if(android.os.Build.VERSION.SDK_INT >= 21)
+        {
+            finishAndRemoveTask();
+        }
+        else
+        {
+            finish();
+        }*/
     }
 
     public ArrayList<Integer> findVendors(Map<String, String> vendorList){
@@ -2471,7 +3085,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                         +"&location_index="+URLEncoder.encode(params[2],"UTF-8");
             }
             catch (UnsupportedEncodingException e) {
-                Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_SHORT).show();
             }
             URL url = null;
             HttpURLConnection connection = null;
@@ -2519,8 +3133,37 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        vendorSearcherDialog.dismiss();
+                    }
+                });
             }
             return null;
         }

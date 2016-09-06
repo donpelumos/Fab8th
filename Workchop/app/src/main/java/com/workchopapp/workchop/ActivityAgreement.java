@@ -75,6 +75,7 @@ public class ActivityAgreement extends AppCompatActivity {
         }
         else {
             Intent intent = new Intent(ActivityAgreement.this, ActivityLogin.class);
+            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             //Toast.makeText(ActivityAgreement.this, "Database Found - " + getDatabasePath("workchop.db").getPath().toString(),
                     //Toast.LENGTH_LONG).show();

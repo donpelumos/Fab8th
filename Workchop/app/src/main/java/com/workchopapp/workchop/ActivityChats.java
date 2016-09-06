@@ -54,11 +54,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -373,8 +376,33 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                     }
                 });
             }
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
 
             return null;
@@ -514,8 +542,34 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        progress.dismiss();
+                    }
+                });
             }
             return null;
         }
@@ -538,10 +592,8 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
             try{
                 URL url2 = new URL(imageUrl);
                 HttpURLConnection connection  = (HttpURLConnection) url2.openConnection();
-
                 connection.setDoOutput(true);
                 connection.connect();
-
                 InputStream is3 = connection.getInputStream();
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -563,8 +615,26 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                 connection.disconnect();
             }
 
-            catch(Exception e){
-                Log.v("ERROR GETTING IMAGE",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
             return null;
         }

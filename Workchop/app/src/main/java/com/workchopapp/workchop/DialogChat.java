@@ -160,9 +160,9 @@ public class DialogChat extends DialogFragment {
                 }
 
                 chatContainer.addView(setUserChat(chatTextBar.getText().toString(), hourString+":"+dateMinute.format(date)+" "+timeSector,
-                        getActivity().getApplicationContext()));
-                new uploadChats(getActivity().getApplicationContext()).execute(userId, vendorId, chatTextBar.getText().toString(),
-                        userId);
+                        getActivity().getApplicationContext(), "1","0"));
+                new uploadChats(getActivity().getApplicationContext()).execute(userId, vendorId,
+                        chatTextBar.getText().toString().replaceAll("(\\r|\\n|\\r\\n)+", "####"), userId);
                 chatTextBar.setText("");
                 chatContainerScroller.post(new Runnable() {
                     @Override
@@ -341,7 +341,7 @@ public class DialogChat extends DialogFragment {
                                 String date_time = valuesa[1];
                                 String sender = valuesa[2];
                                 new clearChats(context).execute(params[0],params[1]);
-                                chatContainer.addView(setVendorChat(msg, getDateFormat(date_time), context));
+                                chatContainer.addView(setVendorChat(msg.replaceAll("####","\r\n"), getDateFormat(date_time), context, valuesa[3], valuesa[4]));
                                 chatContainerScroller.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -478,12 +478,24 @@ public class DialogChat extends DialogFragment {
 
                                     for (int i = 0; i < allChats.length; i++) {
                                         String[] chatRows = allChats[i].split("--");
-                                        if (chatRows[2].equals(userId)) {
-                                            chatContainer.addView(setUserChat(chatRows[3], getDateFormat(chatRows[4]),
-                                                    getActivity().getApplicationContext()));
-                                        } else {
-                                            chatContainer.addView(setVendorChat(chatRows[3], getDateFormat(chatRows[4]),
-                                                    getActivity().getApplicationContext()));
+                                        //Log.v("CHAT",allChats[i]);
+                                        if(chatRows.length > 4) {
+                                            if (chatRows[2].equals(userId)) {
+                                                chatContainer.addView(setUserChat(chatRows[3].replaceAll("####","\r\n"), getDateFormat(chatRows[4]),
+                                                        getActivity().getApplicationContext(), chatRows[5], chatRows[6]));
+                                            } else {
+                                                chatContainer.addView(setVendorChat(chatRows[3].replaceAll("####","\r\n"), getDateFormat(chatRows[4]),
+                                                        getActivity().getApplicationContext(), chatRows[5], chatRows[6]));
+                                            }
+                                        }
+                                        else{
+                                            if (chatRows[2].equals(userId)) {
+                                                chatContainer.addView(setUserChat(chatRows[3], " ",
+                                                        getActivity().getApplicationContext(), "",""));
+                                            } else {
+                                                chatContainer.addView(setVendorChat(chatRows[3], " ",
+                                                        getActivity().getApplicationContext()," "," "));
+                                            }
                                         }
                                         chatContainerScroller.post(new Runnable() {
                                             @Override
@@ -552,17 +564,37 @@ public class DialogChat extends DialogFragment {
             return newFormat;
     }
 
-    public LinearLayout setUserChat(String message, String time, Context context){
+    public LinearLayout setUserChat(String message, String time, Context context, String userSeen, String vendorSeen){
         //Typeface type = Typeface.createFromAsset(getAssets(),"fonts/GOTHIC.TTF");
         float density = getResources().getDisplayMetrics().density;
+
+        LinearLayout chatFrame = new LinearLayout(context);
+        LinearLayout.LayoutParams chatFrameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        chatFrameParams.gravity = Gravity.RIGHT;
+        chatFrame.setGravity(Gravity.RIGHT);
+        chatFrameParams.setMargins((int)(40*density),(int)(3*density),(int)(3*density),(int)(6*density));
+        chatFrame.setOrientation(LinearLayout.HORIZONTAL);
+        chatFrame.setMinimumWidth((int)(120*density));
+        chatFrame.setBackgroundResource(R.drawable.background_rounded_blue);
+        chatFrame.setLayoutParams(chatFrameParams);
+
+        TextView vendorReadText = new TextView(context);
+        LinearLayout.LayoutParams vendorReadTextParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        vendorReadTextParams.setMargins((int)(-5*density),(int)(0*density),(int)(6*density),0);
+        vendorReadTextParams.gravity = Gravity.CENTER_VERTICAL;
+        vendorReadText.setLayoutParams(vendorReadTextParams);
+        vendorReadText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        vendorReadText.setTextColor(Color.parseColor("#22EE22"));
+        vendorReadText.setText("R");
+
         LinearLayout messageFrame = new LinearLayout(context);
         LinearLayout.LayoutParams messageFrameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        messageFrameParams.gravity = Gravity.RIGHT;
-        messageFrameParams.setMargins((int)(40*density),(int)(3*density),(int)(3*density),(int)(6*density));
+        messageFrameParams.setMargins((int)(1*density),(int)(0*density),(int)(1*density),(int)(0*density));
         messageFrame.setOrientation(LinearLayout.VERTICAL);
-        messageFrame.setMinimumWidth((int)(120*density));
-        messageFrame.setBackgroundResource(R.drawable.background_rounded_blue);
+        messageFrame.setBackgroundColor(Color.parseColor("#00ff0000"));
         messageFrame.setLayoutParams(messageFrameParams);
 
         TextView chatText = new TextView(context);
@@ -588,12 +620,20 @@ public class DialogChat extends DialogFragment {
         messageFrame.addView(chatText);
         messageFrame.addView(chatTime);
 
-        return messageFrame;
+        chatFrame.addView(messageFrame);
+        if(vendorSeen.equals("1")) {
+            chatFrame.addView(vendorReadText);
+        }
+        else{
+
+        }
+        return chatFrame;
     }
 
-    public LinearLayout setVendorChat(String message, String time, Context context){
+    public LinearLayout setVendorChat(String message, String time, Context context, String userSeen, String vendorSeen){
         //Typeface type = Typeface.createFromAsset(getAssets(),"fonts/GOTHIC.TTF");
         float density = getResources().getDisplayMetrics().density;
+
         LinearLayout messageFrame = new LinearLayout(context);
         LinearLayout.LayoutParams messageFrameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);

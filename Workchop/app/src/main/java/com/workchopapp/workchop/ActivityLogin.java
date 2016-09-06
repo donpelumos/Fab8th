@@ -882,7 +882,7 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -890,7 +890,7 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -898,7 +898,7 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -965,7 +965,7 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -973,7 +973,7 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -981,7 +981,14 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
                     }
                 });
             }
@@ -1087,8 +1094,36 @@ public class ActivityLogin extends AppCompatActivity {
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
             return null;
         }
@@ -1197,8 +1232,36 @@ public class ActivityLogin extends AppCompatActivity {
                 in.close();
             }
 
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
             return null;
         }
@@ -1361,6 +1424,7 @@ public class ActivityLogin extends AppCompatActivity {
                             loggedId = values[5];
                             //Toast.makeText(ActivityLogin.this, loggedId,Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",loggedFirstname);
                             intent.putExtra("val2",loggedSurname);
                             intent.putExtra("val3",loggedPhoneNo);
@@ -1386,21 +1450,12 @@ public class ActivityLogin extends AppCompatActivity {
                 in.close();
             }
 
-            catch(SocketTimeoutException e){
+            catch(MalformedURLException e){
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                         signingInProgress.dismiss();
-                    }
-                });
-            }
-            catch(IOException e){
-                Handler h = new Handler(Looper.getMainLooper());
-                h.post(new Runnable() {
-                    public void run() {
                         Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                        signingInProgress.dismiss();
                     }
                 });
             }
@@ -1408,7 +1463,24 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
+                        signingInProgress.dismiss();
                         Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        signingInProgress.dismiss();
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
                         signingInProgress.dismiss();
                     }
                 });
@@ -1479,6 +1551,7 @@ public class ActivityLogin extends AppCompatActivity {
                             loggedId = values[6];
                             //Toast.makeText(ActivityLogin.this, loggedId,Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",loggedFirstname);
                             intent.putExtra("val2",loggedSurname);
                             intent.putExtra("val3",loggedPhoneNo);
@@ -1501,6 +1574,7 @@ public class ActivityLogin extends AppCompatActivity {
                             loggedId = values[5];
                             //Toast.makeText(ActivityLogin.this, loggedId,Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",loggedFirstname);
                             intent.putExtra("val2",loggedSurname);
                             intent.putExtra("val3",loggedPhoneNo);
@@ -1525,15 +1599,9 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        try {
-                            //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                            signingInProgress.dismiss();
-                        }
-                        catch (NullPointerException e){
-                            ActivityLogin.this.finishAffinity();
-                            Intent intent = new Intent(context,ActivityTerms.class);
-                            startActivity(intent);
-                        }
+                        ActivityLogin.this.finishAffinity();
+                        Intent intent = new Intent(context,ActivityTerms.class);
+                        startActivity(intent);
                     }
                 });
             }
@@ -1541,15 +1609,9 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        try {
-                            //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                            signingInProgress.dismiss();
-                        }
-                        catch (NullPointerException e){
-                            ActivityLogin.this.finishAffinity();
-                            Intent intent = new Intent(context,ActivityTerms.class);
-                            startActivity(intent);
-                        }
+                        ActivityLogin.this.finishAffinity();
+                        Intent intent = new Intent(context,ActivityTerms.class);
+                        startActivity(intent);
                     }
                 });
             }
@@ -1557,15 +1619,9 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        try {
-                            //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                            signingInProgress.dismiss();
-                        }
-                        catch (NullPointerException e){
-                            ActivityLogin.this.finishAffinity();
-                            Intent intent = new Intent(context,ActivityTerms.class);
-                            startActivity(intent);
-                        }
+                        ActivityLogin.this.finishAffinity();
+                        Intent intent = new Intent(context,ActivityTerms.class);
+                        startActivity(intent);
                     }
                 });
             }
@@ -1775,6 +1831,7 @@ public class ActivityLogin extends AppCompatActivity {
 
 
                             Intent intent = new Intent(ActivityLogin.this, ActivityVendorMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",vendorName);
                             intent.putExtra("val2",vendorPhoneNo);
                             intent.putExtra("val3",vendorLocation);
@@ -1822,6 +1879,9 @@ public class ActivityLogin extends AppCompatActivity {
                         signingInProgress.dismiss();
                     }
                 });
+            }
+            finally{
+                signingInProgress.dismiss();
             }
             return null;
         }
@@ -1891,6 +1951,7 @@ public class ActivityLogin extends AppCompatActivity {
                                 vendorEmail = values[6];
                             }
                             Intent intent = new Intent(ActivityLogin.this, ActivityVendorMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",vendorName);
                             intent.putExtra("val2",vendorPhoneNo);
                             intent.putExtra("val3",vendorLocation);
@@ -1914,6 +1975,7 @@ public class ActivityLogin extends AppCompatActivity {
                                 vendorEmail = values[5];
                             }
                             Intent intent = new Intent(ActivityLogin.this, ActivityVendorMain.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("val1",vendorName);
                             intent.putExtra("val2",vendorPhoneNo);
                             intent.putExtra("val3",vendorLocation);
@@ -1934,15 +1996,9 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        try {
-                            //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                            signingInProgress.dismiss();
-                        }
-                        catch (NullPointerException e){
-                            ActivityLogin.this.finishAffinity();
-                            Intent intent = new Intent(context,ActivityTerms.class);
-                            startActivity(intent);
-                        }
+                        ActivityLogin.this.finishAffinity();
+                        Intent intent = new Intent(context,ActivityTerms.class);
+                        startActivity(intent);
                     }
                 });
             }
@@ -1950,15 +2006,9 @@ public class ActivityLogin extends AppCompatActivity {
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
-                        try {
-                            //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
-                            signingInProgress.dismiss();
-                        }
-                        catch (NullPointerException e){
-                            ActivityLogin.this.finishAffinity();
-                            Intent intent = new Intent(context,ActivityTerms.class);
-                            startActivity(intent);
-                        }
+                        ActivityLogin.this.finishAffinity();
+                        Intent intent = new Intent(context,ActivityTerms.class);
+                        startActivity(intent);
                     }
                 });
             }
@@ -2766,8 +2816,36 @@ public class ActivityLogin extends AppCompatActivity {
                 in.close();
                 in2.close();
             }
-            catch(Exception e){
-                Log.v("ERROR",e.getMessage());
+            catch(MalformedURLException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(URISyntaxException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch(IOException e){
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            finally{
+                Handler h = new Handler(Looper.getMainLooper());
+                h.post(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
             return null;
         }
