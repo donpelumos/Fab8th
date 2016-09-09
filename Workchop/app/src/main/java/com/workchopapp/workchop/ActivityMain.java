@@ -142,6 +142,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     Handler handler, handlerChats;
     ArrayAdapter adapterRecent;
     int totalChatCount = 0;
+    TextView chatNotifierCount;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,6 +153,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
         setContentView(R.layout.activity_main);
         index = 0;
         gpsEnabled = isLocationServiceEnabled();
+        chatNotifierCount = (TextView)findViewById(R.id.chatNotifierCount);
         searchedContactsOfContactCount = new ArrayList<>();
 
         contactsName = new ArrayList<String>();contactsNumber = new ArrayList<String>();
@@ -477,6 +479,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 Intent intent = new Intent(ActivityMain.this, ActivityChats.class);
                 intent.putExtra("userId", userId);
                 intent.putIntegerArrayListExtra("notificationIds",phoneNotificationIds);
+                chatNotifierCount.setVisibility(View.GONE);
                 startActivity(intent);
             }
         });
@@ -488,6 +491,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 Intent intent = new Intent(ActivityMain.this, ActivityChats.class);
                 intent.putExtra("userId", userId);
                 intent.putIntegerArrayListExtra("notificationIds",phoneNotificationIds);
+                chatNotifierCount.setVisibility(View.GONE);
                 startActivity(intent);
             }
         });
@@ -496,7 +500,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             public void onClick(View v) {
                 //messageRoundTabFrame.setBackground(getResources().getDrawable(R.drawable.background_transparent_circle));
                 //exitRoundTabFrame.setBackground(getResources().getDrawable(R.drawable.background_blue_circle));
-                new AlertDialog.Builder(ActivityMain.this)
+                /*new AlertDialog.Builder(ActivityMain.this)
                         .setIcon(R.drawable.exit_new)
                         .setTitle("Exit Application")
                         .setMessage("Are you sure you want to exit?")
@@ -513,12 +517,13 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         })
-                        .show();
+                        .show();*/
             }
         });
         exitRoundImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 messageRoundTabFrame.setBackground(getResources().getDrawable(R.drawable.background_transparent_circle));
                 exitRoundTabFrame.setBackground(getResources().getDrawable(R.drawable.background_blue_circle));
                 new AlertDialog.Builder(ActivityMain.this)
@@ -538,7 +543,7 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         })
-                        .show();
+                        .show();*/
             }
         });
 
@@ -933,19 +938,24 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                                 tempTotalChatCount = tempTotalChatCount + Integer.parseInt(chatRows[4]);
                                 //Log.v("URI", dataUrl2 + "?" + finalDataUrlParameters);
                             }
-
+                            Log.v("TEMP VS PERM",tempTotalChatCount+"--"+totalChatCount);
                             if(totalChatCount > 0 && totalChatCount < tempTotalChatCount ) {
                                 beep = 1;
                             }
                             if(tempTotalChatCount == 0){
                                 totalChatCount = tempTotalChatCount;
                                 beep = 0;
+                                chatNotifierCount.setVisibility(View.GONE);
                             }
                             else if(totalChatCount != tempTotalChatCount){
                                 totalChatCount = tempTotalChatCount;
+                                chatNotifierCount.setText(String.valueOf(totalChatCount));
+                                chatNotifierCount.setVisibility(View.VISIBLE);
                                 beep = 1;
                             }
                             else{
+                                chatNotifierCount.setText(String.valueOf(totalChatCount));
+                                chatNotifierCount.setVisibility(View.VISIBLE);
                                 beep = 0;
                             }
 
@@ -2945,18 +2955,17 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(ActivityMain.this)
+        super.onBackPressed();
+        /*new AlertDialog.Builder(ActivityMain.this)
                 .setIcon(R.drawable.exit)
                 .setTitle("Exit Application")
                 .setMessage("Are you sure you want to exit?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //finish();
                         ActivityMain.this.finishAffinity();
                         handler.removeCallbacksAndMessages(null);
                         handlerChats.removeCallbacksAndMessages(null);
-                        //new setLoggedOut(ActivityMain.this).execute(userId);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -2964,15 +2973,15 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 })
-                .show();
+                .show();*/
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacksAndMessages(null);
+        /*handler.removeCallbacksAndMessages(null);
         handlerChats.removeCallbacksAndMessages(null);
-        /*
+
         finishAffinity();
         if(android.os.Build.VERSION.SDK_INT >= 21)
         {

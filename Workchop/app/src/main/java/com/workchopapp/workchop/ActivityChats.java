@@ -88,10 +88,12 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
     int chatOpen=0;
     String fromScreen="chats", notificationName="";
     int currentChatPosition=-1;
-    Handler handler;
+    Handler handler, chatLoadHandler;
+    int chatLoadTime = 0;
     String currentChatId;
     ArrayList<ListChats> chats;
     int totalChatCount = 0;
+    int chatLoaded = 0;
 
     public ActivityChats(){
 
@@ -120,6 +122,25 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
         progress = new ProgressDialog(ActivityChats.this);
         progress.setTitle("Loading");
         progress.show();
+        chatLoadHandler = new Handler();
+        chatLoadHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(chatLoadTime == 13){
+                    progress.dismiss();
+                    Toast.makeText(ActivityChats.this,"Check Internet Connection,",Toast.LENGTH_SHORT).show();
+                    chatLoadHandler.removeCallbacksAndMessages(null);
+                }
+                else if (chatLoaded == 1){
+                    chatLoadHandler.removeCallbacksAndMessages(null);
+                    Log.v("CHAT LOADED"," BEFORE TIME OUT");
+                }
+                else{
+                    chatLoadTime++;
+                    chatLoadHandler.postDelayed(this,1000);
+                }
+            }
+        }, 1000);
         new getChats(ActivityChats.this).execute(userId);
         try {
             if (getIntent().getStringExtra("val7").equals("notification")) {
@@ -504,9 +525,11 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                     public void run() {
                         if(sb.toString().equals("false")){
                             progress.dismiss();
+                            Toast.makeText(context,"No Chats",Toast.LENGTH_SHORT).show();
                         }
                         else {
                             if(sb2.toString().contains("------")) {
+                                chatLoaded = 1;
                                 String[] allChats = sb2.toString().split("------");
 
                                 for (int i = 0; i < allChats.length; i++) {

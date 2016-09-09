@@ -51,6 +51,7 @@ public class ActivityAgreement extends AppCompatActivity {
                 public void onClick(View v) {
                     Intent loginScreen = new Intent(ActivityAgreement.this, ActivityLogin.class);
                     startActivity(loginScreen);
+                    finish();
                 }
             });
             terms = (TextView)findViewById(R.id.tc);
@@ -77,6 +78,7 @@ public class ActivityAgreement extends AppCompatActivity {
             Intent intent = new Intent(ActivityAgreement.this, ActivityLogin.class);
             //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            finish();
             //Toast.makeText(ActivityAgreement.this, "Database Found - " + getDatabasePath("workchop.db").getPath().toString(),
                     //Toast.LENGTH_LONG).show();
         }

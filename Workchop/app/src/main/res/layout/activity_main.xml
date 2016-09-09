@@ -389,6 +389,7 @@
                             android:layout_gravity="center"
                             android:text="3"
                             android:textSize="11sp"
+                            android:visibility="invisible"
                             android:id="@+id/chatNotifierCount"/>
                     </LinearLayout>
 

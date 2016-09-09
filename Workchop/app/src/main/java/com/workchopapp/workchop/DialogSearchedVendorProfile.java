@@ -1083,7 +1083,13 @@ public class DialogSearchedVendorProfile extends DialogFragment  implements  Dia
     }
 
     public LinearLayout setReview(String name, String message, int rating, Context context, String points){
-        Typeface type = Typeface.createFromAsset(getActivity().getAssets(),"fonts/GOTHIC.TTF");
+        Typeface type = null;
+        try {
+            type = Typeface.createFromAsset(getActivity().getAssets(), "fonts/GOTHIC.TTF");
+        }
+        catch(NullPointerException e){
+
+        }
         float density = getResources().getDisplayMetrics().density;
         LinearLayout reviewFrame = new LinearLayout(context);
         LinearLayout.LayoutParams reviewFrameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,

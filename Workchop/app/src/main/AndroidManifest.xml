@@ -68,7 +68,7 @@
         <activity
             android:name="com.workchopapp.workchop.ActivityMain"
             android:label="Main"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
         </activity>
         <activity
             android:name="com.workchopapp.workchop.ActivityMyVendors"

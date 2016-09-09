@@ -1322,6 +1322,9 @@ public class ActivityLogin extends AppCompatActivity {
                         else if(sb.toString().split("--")[0].equals("logged")){
                             File root = new File(Environment.getExternalStorageDirectory()+File.separator+"Workchop", "files");
                             File gpxfile = new File(root, "phone_number.txt");
+                            mydatabase2.execSQL("CREATE TABLE IF NOT EXISTS LoginDetails(detail VARCHAR);");
+                            mydatabase2.execSQL(String.format("INSERT INTO LoginDetails VALUES('%s');",
+                                    params[0]+"=="+params[1]+"==1"));
                             if(gpxfile.exists()){
                                 StringBuilder text = new StringBuilder();
                                 try {
@@ -1436,9 +1439,11 @@ public class ActivityLogin extends AppCompatActivity {
                             mydatabase2.execSQL("CREATE TABLE IF NOT EXISTS LoginDetails(detail VARCHAR);");
                             mydatabase2.execSQL(String.format("INSERT INTO LoginDetails VALUES('%s');",
                                     params[0]+"=="+params[1]+"==1"));
+                            Log.v("DATABASE TABLE","CREATED");
 
                             signingInProgress.dismiss();
                             startActivity(intent);
+                            finish();
                             //new getUserDetails(ActivityLogin.this).execute(loggedEmail, loggedPassword);
                             //Intent int1 = new Intent(ActivityLogin.this, ActivityMain.class);
                             //startActivity(int1);
@@ -1561,6 +1566,7 @@ public class ActivityLogin extends AppCompatActivity {
                             intent.putExtra("val7","loginScreen");
                             //signingInProgress.dismiss();
                             startActivity(intent);
+                            finish();
                         }
                         else{
                             //Toast.makeText(context, "Correct Email and Password", Toast.LENGTH_SHORT).show();
@@ -1584,6 +1590,7 @@ public class ActivityLogin extends AppCompatActivity {
                             intent.putExtra("val7","loginScreen");
                             //signingInProgress.dismiss();
                             startActivity(intent);
+                            finish();
                             //new getUserDetails(ActivityLogin.this).execute(loggedEmail, loggedPassword);
                             //Intent int1 = new Intent(ActivityLogin.this, ActivityMain.class);
                             //startActivity(int1);
@@ -1683,6 +1690,9 @@ public class ActivityLogin extends AppCompatActivity {
                         else if(sb.toString().split("--")[0].equals("logged")){
                             File root = new File(Environment.getExternalStorageDirectory()+File.separator+"Workchop", "files");
                             File gpxfile = new File(root, "phone_number_vendor.txt");
+                            mydatabase2.execSQL("CREATE TABLE IF NOT EXISTS LoginDetails(detail VARCHAR);");
+                            mydatabase2.execSQL(String.format("INSERT INTO LoginDetails VALUES('%s');",
+                                    params[0]+"=="+params[1]+"==2"));
                             if(gpxfile.exists()){
                                 StringBuilder text = new StringBuilder();
                                 try {
