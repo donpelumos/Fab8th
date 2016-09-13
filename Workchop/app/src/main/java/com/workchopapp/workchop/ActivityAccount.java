@@ -525,6 +525,7 @@ DialogUserSelectLocation.ColorSelected{
 
                 }
                 else{
+
                     h.post(new Runnable() {
                         public void run() {
                             String [] values = sb.toString().split("--");
