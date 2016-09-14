@@ -93,6 +93,9 @@ DialogUserSelectLocation.ColorSelected{
     int confirmationMode = 0;
     ProgressDialog progress;
     Typeface type;
+    int timer=1;
+    Handler imageLoaderHandler=null;
+    AsyncTask<String,Void,String> pictureAsyncTask=null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,6 +105,9 @@ DialogUserSelectLocation.ColorSelected{
         setContentView(R.layout.activity_account);
         type = Typeface.createFromAsset(getAssets(),"fonts/GOTHIC.TTF");
         progress = new ProgressDialog(ActivityAccount.this);
+        imageLoaderHandler = new Handler();
+        pictureAsyncTask = new getUserPicture(ActivityAccount.this);
+
         progress.setTitle("Loading");
         progress.setMessage("Loading . . .");
         progress.show();
@@ -198,7 +204,13 @@ DialogUserSelectLocation.ColorSelected{
                 return false;
             }
         });
-        new getUserPicture(ActivityAccount.this).execute();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        pictureAsyncTask.cancel(true);
     }
 
     @Override
@@ -565,11 +577,14 @@ DialogUserSelectLocation.ColorSelected{
                                         break;
                                 }
                                 userLocation.setText(locationString);
+
+                                pictureAsyncTask.execute();
                             }
                         }
                     });
                 }
                 in.close();
+
             }
 
             catch(MalformedURLException e){
@@ -796,6 +811,8 @@ DialogUserSelectLocation.ColorSelected{
 
     private class getUserPicture extends AsyncTask<String,Void,String> {
         Context context;
+        Bitmap img;
+        HttpURLConnection connection = null;
 
         public getUserPicture(Context c){
             context = c;
@@ -804,14 +821,14 @@ DialogUserSelectLocation.ColorSelected{
         @Override
         protected String doInBackground(String... params) {
             String imageUrl= "http://workchopapp.com/mobile_app/user_pictures/"+userId+".jpg";
-
+            Log.v("INSIDE","GET PICTURE");
             String dataUrlParameters = null;
 
             URL url = null;
             try{
 
                 URL url2 = new URL(imageUrl);
-                HttpURLConnection connection  = (HttpURLConnection) url2.openConnection();
+                connection  = (HttpURLConnection) url2.openConnection();
 
 
                 Log.v("VENDORS GOTTEN","VENDORS GOTTEN");
@@ -819,25 +836,48 @@ DialogUserSelectLocation.ColorSelected{
                 connection.setDoOutput(true);
                 connection.connect();
                 is3 = connection.getInputStream();
+                Log.v("CONNECTION", "CONNECTED");
                 BitmapFactory.Options options = new BitmapFactory.Options();
+                Log.v("BITMAP FACTORY", "CONNECTED");
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                final Bitmap img = BitmapFactory.decodeStream(is3);
-
+                Log.v("BITMAP FACTORY", "OPTIONS SET");
+                img = BitmapFactory.decodeStream(is3);
+                Log.v("STREAM", "DECODED");
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
+
                         accountImage.setImageBitmap(img );
                         progress.dismiss();
                         editAccount.setEnabled(true);
+                        imageLoaderHandler.removeCallbacksAndMessages(null);
+                        try {
+                            is3.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        connection.disconnect();
                     }
                 });
-
+                try {
+                    is3.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                connection.disconnect();
+                Log.v("FINISHED","GETTING PICTURE");
             }
 
             catch(MalformedURLException e){
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
+                        try {
+                            is3.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        connection.disconnect();
                         //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -846,6 +886,12 @@ DialogUserSelectLocation.ColorSelected{
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
+                        try {
+                            is3.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        connection.disconnect();
                         //Toast.makeText(context, "Unable to Connect", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -854,10 +900,17 @@ DialogUserSelectLocation.ColorSelected{
                 Handler h = new Handler(Looper.getMainLooper());
                 h.post(new Runnable() {
                     public void run() {
+                        try {
+                            is3.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        connection.disconnect();
                         progress.dismiss();
                     }
                 });
             }
+
             return null;
         }
     }

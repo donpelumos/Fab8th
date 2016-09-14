@@ -137,7 +137,7 @@ public class ActivityChats extends AppCompatActivity implements DialogChat.Retur
                 }
                 else{
                     chatLoadTime++;
-                    chatLoadHandler.postDelayed(this,1000);
+                    //chatLoadHandler.postDelayed(this,1000);
                 }
             }
         }, 1000);

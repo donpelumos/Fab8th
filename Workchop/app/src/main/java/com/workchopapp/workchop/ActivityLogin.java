@@ -728,7 +728,8 @@ public class ActivityLogin extends AppCompatActivity {
                 Log.v("Comparing ", resultSet.getString(0).split("==")[2]);
                 if (resultSet.getString(0).split("==")[2].equals("1")) {
                     new userSignInAuto(ActivityLogin.this).execute(userEmail, userPassword);
-                } else {
+                }
+                else {
                     new vendorSignInAuto(ActivityLogin.this).execute(userEmail, userPassword);
                 }
             }
@@ -2719,9 +2720,14 @@ public class ActivityLogin extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //finish();
-                        hand.removeCallbacksAndMessages(null);
-                        deleteDatabase("workchop_user_account.db");
-                        ActivityLogin.this.finishAffinity();
+                        try {
+                            hand.removeCallbacksAndMessages(null);
+                            deleteDatabase("workchop_user_account.db");
+                            ActivityLogin.this.finishAffinity();
+                        }
+                        catch(NullPointerException e){
+
+                        }
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

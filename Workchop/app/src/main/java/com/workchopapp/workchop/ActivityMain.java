@@ -898,9 +898,11 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
             catch (UnsupportedEncodingException e) {
                 Toast.makeText(context,new String("Exception: "+ e.getCause()+ "\n"+ e.getMessage()), Toast.LENGTH_LONG).show();
             }
+            Log.v("CHAT URL",dataUrl2+"?"+dataUrlParameters);
             try {
                 HttpClient client2 = new DefaultHttpClient();
                 HttpGet request2 = new HttpGet();
+
                 request2.setURI(new URI(dataUrl2+"?"+dataUrlParameters));
                 HttpResponse response2 = client2.execute(request2);
                 BufferedReader in2 = new BufferedReader(new InputStreamReader(response2.getEntity().getContent()));
@@ -979,32 +981,16 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
                 });
             }
             catch(MalformedURLException e){
-                Handler h = new Handler(Looper.getMainLooper());
-                h.post(new Runnable() {
-                    public void run() {
-                    }
-                });
+
             }
             catch(URISyntaxException e){
-                Handler h = new Handler(Looper.getMainLooper());
-                h.post(new Runnable() {
-                    public void run() {
-                    }
-                });
+
             }
             catch(IOException e){
-                Handler h = new Handler(Looper.getMainLooper());
-                h.post(new Runnable() {
-                    public void run() {
-                    }
-                });
+
             }
             finally{
-                Handler h = new Handler(Looper.getMainLooper());
-                h.post(new Runnable() {
-                    public void run() {
-                    }
-                });
+                Log.v("CHAT ERROR","ERROR");
             }
 
             return null;
@@ -2979,9 +2965,9 @@ public class ActivityMain extends AppCompatActivity implements DialogLocationSel
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /*handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacksAndMessages(null);
         handlerChats.removeCallbacksAndMessages(null);
-
+        /*
         finishAffinity();
         if(android.os.Build.VERSION.SDK_INT >= 21)
         {
