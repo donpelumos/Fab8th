@@ -150,7 +150,7 @@
 				//echo $partA . " " . $partB;
 			}
 			$review = explode("&&&",explode("======",explode("|-|-|",$a)[0])[0])[2];
-			$point = (5*$review)+(4*$coCount)+(2*$cocCount);
+			$point = (3*$review)+(5*$coCount)+(4*$cocCount);
 			$vendorId = explode("&&&",explode("======",explode("|-|-|",$a)[0])[0])[1];
 			$row = explode("&&&",explode("======",explode("|-|-|",$a)[0])[0])[0]. "----" . $vendorId . "----" . $review . "----" .
 			 $coCount . "----" . $cocCount . "----" . $partA . " " . "----" . $partB. " " . "----" . $point;
