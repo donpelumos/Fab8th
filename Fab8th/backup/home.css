@@ -1,0 +1,62 @@
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+body {background-color: #efefef; /*background-image: url("apc.jpg"); background-repeat: repeat;*/}
+p.fab{margin-bottom:1px; margin-top:1px; margin-left:1px;margin-right:2px; font-size: 38px; font-family: GungsuhChe; 
+color: white; color:#ED188A; text-shadow: 5px 5px 5px #D2D0D9;}
+p.fab_sub{margin-top:1px; margin-bottom:1px; font-family:ar decode; font-size:34px;}
+img.socialicons{margin-left: 5px; margin-right: 5px; margin-top:2px; margin-bottom:2px; vertical-align: middle; align: middle;}
+img.logo{width:95px; height:95px;}
+.logo_frame{width:105px; height:105px;}
+a.jempton{font-size:16px; color:#999999; text-decoration:none;}
+a.jempton:hover{color:#ED188A; text-decoration:none;}
+.reason_heading{color:#ED188A; font-size:53px}
+.reason_subheading{color:#008080; font-size:45px}
+.reason_body{color:#117F62; font-size:34px;  text-align:justify; font-family: GungsuhChe;}
+a.button_mine{border: 2px solid #ED188A; background-color:white; padding:10px 10px; border-radius:5px; text-decoration:none; color:#ED188A; font-size:16px;}
+a.button_mine:hover{border: 2px solid #ED188A; background-color:#ED188A; padding:10px 10px; border-radius:5px; color:white;  font-size:16px;}
+
+
+
+@media screen and (max-width:1150px){
+@font-face {
+    font-family: GungsuhChe;
+    src: url(Batang.tff);
+}
+
+p.fab{margin-bottom:1px; margin-top:1px; margin-left:1px;margin-right:2px; font-size: 23px; font-family: GungsuhChe, agency fb; 
+color: white; color:#ED188A; text-shadow: 5px 5px 5px #D2D0D9;}
+p.fab_sub{margin-top:1px; margin-bottom:1px; font-family:ar decode; font-size:17px;}
+img.socialicons{margin-left: 2px; margin-right: 2px; margin-top:1px; margin-bottom:1px; vertical-align: middle; align: middle;}
+img.logo{width:80px; height:80px;}
+.logo_frame{width:85px; height:85px;}
+
+.reason_heading{color:#ED188A; font-size:30px}
+.reason_subheading{color:#008080; font-size:25px}
+.reason_body{color:#117F62; font-size:20px;}
+a.button_mine{border: 2px solid #ED188A; background-color:white; padding:10px 10px; border-radius:5px; text-decoration:none; color:#ED188A; font-size:16px; margin-top:10px;}
+a.button_mine:hover{border: 2px solid #ED188A; background-color:#ED188A; padding:10px 10px; border-radius:5px; color:white;  font-size:16px;}
+
+}
+
+
+@media screen and (max-width:400px){
+@font-face {
+    font-family: GungsuhChe;
+    src: url(Batang.tff);
+}
+
+p.fab{margin-bottom:1px; margin-top:1px; margin-left:1px;margin-right:2px; font-size: 23px; font-family: GungsuhChe, agency fb; 
+color: white; color:#ED188A; text-shadow: 5px 5px 5px #D2D0D9;}
+p.fab_sub{margin-top:1px; margin-bottom:1px; font-family:ar decode; font-size:17px;}
+img.socialicons{margin-left: 2px; margin-right: 2px; margin-top:1px; margin-bottom:1px; vertical-align: middle; align: middle;}
+img.logo{width:80px; height:80px;}
+.logo_frame{width:85px; height:85px;}
+
+.reason_heading{color:#ED188A; font-size:27px}
+.reason_subheading{color:#008080; font-size:23px}
+.reason_body{color:#117F62; font-size:16px;}
+a.button_mine{border: 2px solid #ED188A; background-color:white; padding:10px 10px; border-radius:5px; text-decoration:none; color:#ED188A; font-size:16px; margin-top:10px;}
+a.button_mine:hover{border: 2px solid #ED188A; background-color:#ED188A; padding:10px 10px; border-radius:5px; color:white;  font-size:16px;}
+}
