@@ -1,8 +1,0 @@
-
-RewriteEngine on
-DirectoryIndex home.php
-
-RewriteCond %{HTTP_HOST} ^fab8thproductions\.com$ [OR]
-RewriteCond %{HTTP_HOST} ^www\.fab8thproductions\.com$
-RewriteRule ^index\.html$ "http\:\/\/www\.fab8thproductions\.com\/home\.php" [R=301,L]
-

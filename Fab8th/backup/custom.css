@@ -1,8 +1,0 @@
-.nav.navbar-nav.navbar-left > li.active > a,
-.nav.navbar-nav.navbar-left > li.active > a:hover,
-.nav.navbar-nav.navbar-left > li.active > a:focus{
-	color:#FFF;
-    border-bottom:3px solid rgba(112,177,242,1);
-	background-color:transparent;
-	bottom:0px;
-} 
